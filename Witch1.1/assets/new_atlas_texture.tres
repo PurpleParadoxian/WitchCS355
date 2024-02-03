@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://d3kebjrxrc7yd"]
+
+[ext_resource type="Texture2D" path="res://assets/atlastexture.dds" id="1_ypr1w"]
+
+[resource]
+atlas = ExtResource("1_ypr1w")
+filter_clip = true
