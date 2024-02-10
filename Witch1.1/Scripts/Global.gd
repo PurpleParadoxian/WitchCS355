@@ -35,6 +35,7 @@ enum {
 	FRONT,
 	BACK,
 	SOLID,
+	COLOR,
 }
 
 enum {
@@ -49,18 +50,15 @@ const types = {
 		SOLID:false
 	},
 	DIRT:{
-		TOP:Vector2(2, 0), BOTTOM:Vector2(2, 0), LEFT: Vector2(2, 0),
-		RIGHT:Vector2(2, 0), FRONT:Vector2(2, 0), BACK: Vector2(2, 0),
+		COLOR:Color("BROWN"),
 		SOLID:true
 	},
 	GRASS:{
-		TOP:Vector2(0, 0), BOTTOM:Vector2(2, 0), LEFT: Vector2(1, 0),
-		RIGHT:Vector2(1, 0), FRONT:Vector2(1, 0), BACK: Vector2(1, 0),
+		COLOR:Color("LIGHT_GREEN"),
 		SOLID:true
 	},
 	STONE:{
-		TOP:Vector2(0, 1), BOTTOM:Vector2(0, 1), LEFT: Vector2(0, 1),
-		RIGHT:Vector2(0, 1), FRONT:Vector2(0, 1), BACK: Vector2(0, 1),
+		COLOR:Color(150, 150, 150),
 		SOLID:true
 	}
 }
