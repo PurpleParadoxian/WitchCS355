@@ -11,3 +11,8 @@ offset_top = 484.0
 offset_right = 710.0
 offset_bottom = 558.0
 horizontal_alignment = 1
+
+[node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
+handle_input_locally = false
+canvas_cull_mask = 4294967294

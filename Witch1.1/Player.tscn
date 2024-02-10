@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://cpk56y7cn7pp2"]
+[gd_scene load_steps=5 format=3 uid="uid://cpk56y7cn7pp2"]
 
 [ext_resource type="Script" path="res://Scripts/Player.gd" id="1_hyti2"]
+[ext_resource type="PackedScene" uid="uid://osx1lhjgkx7u" path="res://HUD.tscn" id="2_uhrar"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_oaa5q"]
 
@@ -20,3 +21,10 @@ mesh = SubResource("CylinderMesh_0rr8d")
 
 [node name="Camera" type="Camera3D" parent="Head"]
 current = true
+
+[node name="HUD" parent="Head" instance=ExtResource("2_uhrar")]
+
+[node name="HUD Map Camera" type="Camera3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10.5261)
+cull_mask = 1048574
+projection = 1
