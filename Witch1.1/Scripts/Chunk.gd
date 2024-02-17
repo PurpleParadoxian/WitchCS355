@@ -2,7 +2,6 @@
 extends StaticBody3D
 
 var blocks = []
-var seedAir = [Vector3(0, 0, 0)]
 var faceList = []
 var entities = []
 
@@ -14,81 +13,54 @@ var material = preload("res://assets/new_standard_material_3d.tres")
 
 var chunk_position = Vector3i() : set = set_chunk_position
 
-func _ready():
-	generate()
-	build()
-	update()
+func toBlock(x, y, z):
+	return (int(x)<<6) & (int(y)<<6) & (int(z)<<6)
 
-func generate():
+func generate( bytes : PackedByteArray = PackedByteArray()):
+	
 	print("start generate")
 	blocks = []
-	blocks.resize(Global.DIMENSION.x)
-	for x in Global.DIMENSION.x:
-		blocks[x] = []
-		blocks[x].resize(Global.DIMENSION.y)
-		for y in Global.DIMENSION.y:
-			blocks[x][y] = []
-			blocks[x][y].resize(Global.DIMENSION.z)
-			for z in Global.DIMENSION.z:
-				var block = Global.AIR
-				if 16<=x and x<=48 and 16<=z and z<=48:
-					if 16 < y:
-						if y < 40:
-							block = Global.STONE
-						elif y < 48:
-							block = Global.DIRT
-						elif y == 48:
-							block = Global.GRASS
-				if block != Global.AIR:
-					if (x-32)*(x-32) + (y-32)*(y-32) + (z-32)*(z-32) > 16*16: block = Global.AIR
-				blocks[x][y][z] = block
-
-func depthFill(prevList, thisList):
-	var newList = []
-	var allList = prevList + thisList
-	for item in thisList:
+	var size = Global.DIMENSION.x*Global.DIMENSION.y*Global.DIMENSION.z
+	blocks.resize(size)
+	blocks.fill(Global.AIR)
+	
+	var i = 0
+	var j = 0
+	var continuing = false
+	var previousBlock = 0
+	while i < size and bytes.size() > j:
+		var cha = bytes[j]
+		j += 1
 		
-		if check_transparent(item):
-			for i in Global.FACE_SIDES:
-				var a = item + i
-				var yes = false
-				for j in range(3):
-					if a[j] < 0 or Global.DIMENSION[0] <= a[j]: 
-						yes = true # this should ask other chunks
-						break
-				if yes: continue
-				if !allList.has(a) and !newList.has(a):
-					newList += [a]
-		else:
-			var chk_blk = Global.types[blocks[item.x][item.y][item.z]]
-			for i in range(6):
-				var chk_item = item + Global.FACE_SIDES[i]
-				if check_transparent(chk_item): # or are the same type
-					faceList += [[Global.faces[i], item, chk_blk[i]]]
-	return newList
+		if continuing:
+			continuing = false
+			if previousBlock != Global.AIR:
+				for k in range(cha): blocks[k] = previousBlock
+			i += cha
+			continue
+		
+		match cha:
+			1: blocks[i] = Global.STONE
+			2: blocks[i] = Global.DIRT
+			3: blocks[i] = Global.GRASS
+			255: 
+				continuing = true
+				continue
+		
+		i += 1
+	
+	while i < size:
+		# fill the rest of the blocks i to size with air
+		blocks[i] = Global.AIR
+		i = i+1
 
 func build():
-	"""
-	print("start build")
-	for mySeed in seedAir:
-		print("a")
-		var prevList = []
-		var thisList = [mySeed]
-		while !thisList.is_empty():
-			print("b")
-			var newList = depthFill(prevList, thisList)
-			prevList = thisList
-			thisList = newList
-			#await get_tree().create_timer(1).timeout
-		print("number of faces: ", len(faceList))
-	"""
-	# I don't like that this is faster...
 	for x in Global.DIMENSION.x:
 		for y in Global.DIMENSION.y:
 			for z in Global.DIMENSION.z:
 				var item = Vector3(x, y, z)
 				if !check_transparent(item):
-					var chk_blk = Global.types[blocks[item.x][item.y][item.z]]
+					var chk_blk = Global.types[blocks[toBlock(item.x, item.y, item.z)]]
 					for i in range(6):
 						var chk_item = item + Global.FACE_SIDES[i]
 						if check_transparent(chk_item): # or are the same type
@@ -125,7 +97,7 @@ func check_transparent(off):
 	for i in range(3):
 		if off[i] < 0 or off[i] >= Global.DIMENSION[i]:
 			return false
-	return not Global.types[blocks[off.x][off.y][off.z]][Global.SOLID]
+	return not Global.types[blocks[toBlock(off.x, off.y, off.z)]][Global.SOLID]
 
 func create_face(face, off, texture_offset):
 	var newOff = Global.BLOCK_SCALE * off
