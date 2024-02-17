@@ -2,6 +2,8 @@ extends CharacterBody3D
 
 @onready var head = $Head
 @onready var camera = $Head/Camera
+@onready var cast = $Head/RayCast3D
+@onready var collShape : CollisionShape3D = $COLLISION
 
 const movement_speed = 10
 const jump_velocity = 10
@@ -25,6 +27,7 @@ func _input(event):
 	
 	if Input.is_action_just_pressed("God"):
 		god = not god
+		collShape.disabled = god
 	
 	if event is InputEventMouseMotion:
 		head.rotate_y(deg_to_rad(-event.relative.x * mouse_sensitivity))
@@ -48,6 +51,7 @@ func _physics_process(delta):
 		direction -= my_basis.x
 	if Input.is_action_pressed("Right"):
 		direction += my_basis.x
+	
 	if god:
 		if Input.is_action_pressed("Jump"):
 			direction += my_basis.y
@@ -63,3 +67,12 @@ func _physics_process(delta):
 			velocity.y = jump_velocity
 		velocity.y -= gravity*delta
 	move_and_slide()
+	
+	# place and break blocks
+	if cast.is_colliding():
+		var collPoint = (cast.get_collision_point() - (cast.get_collision_normal()/(Global.DIMENSION[0]*Global.BLOCK_SCALE))/2).floor()
+		var chunkPos = collPoint.posmod(Global.DIMENSION[0])
+		
+		
+		if Input.is_action_just_pressed("Place"):
+			

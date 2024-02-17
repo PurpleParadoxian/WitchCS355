@@ -1,10 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://cjbw6dqehjq0w"]
 
-[ext_resource type="Script" path="res://Scripts/World.gd" id="1_puf6s"]
+[ext_resource type="Script" path="res://Scripts/DevWorld.gd" id="1_q8wcj"]
 [ext_resource type="PackedScene" uid="uid://cpk56y7cn7pp2" path="res://Player.tscn" id="2_7bwhx"]
 
 [node name="World" type="Node3D"]
-script = ExtResource("1_puf6s")
+script = ExtResource("1_q8wcj")
 
 [node name="Player" parent="." instance=ExtResource("2_7bwhx")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.12024, 4.0804, 5.01049)
