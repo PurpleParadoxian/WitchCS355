@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://cwh0as6nuwu5l"]
+[gd_scene load_steps=6 format=3 uid="uid://cwh0as6nuwu5l"]
 
 [ext_resource type="Script" path="res://Scripts/DevPlayer.gd" id="1_rb7rb"]
 [ext_resource type="PackedScene" uid="uid://osx1lhjgkx7u" path="res://HUD.tscn" id="2_vqkcf"]
@@ -7,6 +7,8 @@
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_0rr8d"]
 
+[sub_resource type="BoxMesh" id="BoxMesh_07io2"]
+
 [node name="Player" type="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 script = ExtResource("1_rb7rb")
@@ -14,9 +16,14 @@ script = ExtResource("1_rb7rb")
 [node name="COLLISION" type="CollisionShape3D" parent="."]
 shape = SubResource("CylinderShape3D_oaa5q")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="PlayerMesh" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0162538, 0, 0.00887871)
 mesh = SubResource("CylinderMesh_0rr8d")
+
+[node name="SelectedBlockMesh" type="MeshInstance3D" parent="."]
+transparency = 0.9
+cast_shadow = 0
+mesh = SubResource("BoxMesh_07io2")
 
 [node name="Head" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.528845, 0)
@@ -26,7 +33,7 @@ current = true
 
 [node name="HUD" parent="Head" instance=ExtResource("2_vqkcf")]
 
-[node name="HUD Map Camera" type="Camera3D" parent="Head"]
+[node name="HUDMapCamera" type="Camera3D" parent="Head"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10.5261)
 cull_mask = 1048574
 projection = 1

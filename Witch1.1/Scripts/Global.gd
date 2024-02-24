@@ -38,6 +38,8 @@ enum {
 	COLOR,
 }
 
+const BLOCK_NAME_LIST = ["Air", "Dirt", "Grass", "Stone"]
+
 enum {
 	AIR,
 	DIRT,
@@ -62,6 +64,3 @@ const types = {
 		SOLID:true
 	}
 }
-
-func modVector3(a, b):
-	return Vector3(a[0] % b, a[1] % b, a[2] % b)
