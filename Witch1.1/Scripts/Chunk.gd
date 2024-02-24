@@ -1,4 +1,3 @@
-@tool
 extends StaticBody3D
 
 var blocks = []
@@ -14,10 +13,17 @@ var material = preload("res://assets/new_standard_material_3d.tres")
 var chunk_position = Vector3i() : set = set_chunk_position
 
 func toBlock(x, y, z):
-	return (int(x)<<6) & (int(y)<<6) & (int(z)<<6)
+	return (int(x)<<6) & (int(y)<<3) & (int(z))
+
+func calc(a = null):
+	if a == null: 
+		generate()
+	else: 
+		generate(a)
+		build()
+	update()
 
 func generate( bytes : PackedByteArray = PackedByteArray()):
-	
 	print("start generate")
 	blocks = []
 	var size = Global.DIMENSION.x*Global.DIMENSION.y*Global.DIMENSION.z
@@ -58,7 +64,7 @@ func build():
 	for x in Global.DIMENSION.x:
 		for y in Global.DIMENSION.y:
 			for z in Global.DIMENSION.z:
-				var item = Vector3(x, y, z)
+				var item = Vector3i(x, y, z)
 				if !check_transparent(item):
 					var chk_blk = Global.types[blocks[toBlock(item.x, item.y, item.z)]]
 					for i in range(6):
@@ -120,6 +126,9 @@ func create_face(face, off, texture_offset):
 
 func set_chunk_position(pos):
 	chunk_position = pos
-	self.position = pos*Global.DIMENSION*Global.BLOCK_SCALE
+	self.position = Vector3(pos*Global.DIMENSION*Global.BLOCK_SCALE)
 	
 	#self.visible = false
+
+func place_block(pos, type):
+	pass # handle placing blocks (modify the faces list)

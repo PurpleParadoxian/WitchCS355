@@ -3,12 +3,13 @@ extends Node
 var mainMenuScene = preload("res://Menu.tscn")
 @onready var label = $Label
 
-var activeScene = mainMenuScene
+var activeScene = null
 
 func _ready():
-	mainMenuScene.instantiate()
-	mainMenuScene.hello()
-	add_child(mainMenuScene)
+	var mmScene = mainMenuScene.instantiate()
+	activeScene = mmScene
+	mmScene.hello()
+	add_child(mmScene)
 	label.visible = false
 
 func changeScene(scene, info):

@@ -1,4 +1,4 @@
-@tool
+#@tool
 extends Node3D
 
 var chunk_scene = preload("res://chunk.tscn")
@@ -50,7 +50,8 @@ func _thread_process():
 	print("thread running")
 	prev_player_position = floor(player_position/(Global.BLOCK_SCALE*Global.DIMENSION))
 	while(true):
-		await get_tree().create_timer(1).timeout
+		continue
+	
 		update_player_position.call_deferred()
 		var pPos = floor(player_position/(Global.BLOCK_SCALE*Global.DIMENSION))
 		if pPos == prev_player_position: continue
