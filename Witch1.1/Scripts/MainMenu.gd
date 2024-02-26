@@ -4,6 +4,8 @@ extends Node2D
 @onready var buttonDev = $Button1
 @onready var buttonNormal = $Button2
 
+signal changeScene(scenePath : String, info : Variant)
+
 var dir : DirAccess
 var item
 
@@ -18,17 +20,18 @@ func _ready():
 	for str in strs:
 		list.add_item(str)
 
-func hello():
-	print("hello")
-
 func _on_button_1_pressed():
 	buttonDev.disabled = true
 	buttonNormal.disabled = true
-	get_parent().changeScene("res://DevWorld.tscn", [list.get_item_text(item), true])
+	print("emitted")
+	var a = len(changeScene.get_connections())
+	if a != 0:
+		changeScene.emit("res://DevWorld.tscn", [list.get_item_text(item), true])
 
 func _on_button_2_pressed():
 	pass # I haven't implemented the normal mode yet
 
 func _on_item_list_item_selected(index):
+	print('selected soemthing')
 	item = index
 	buttonDev.disabled = false

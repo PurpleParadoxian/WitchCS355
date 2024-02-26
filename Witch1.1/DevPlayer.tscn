@@ -21,7 +21,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0162538, 0, 0.00887871)
 mesh = SubResource("CylinderMesh_0rr8d")
 
 [node name="SelectedBlockMesh" type="MeshInstance3D" parent="."]
-transparency = 0.9
+transparency = 0.7
 cast_shadow = 0
 mesh = SubResource("BoxMesh_07io2")
 
@@ -31,13 +31,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.528845, 0)
 [node name="Camera" type="Camera3D" parent="Head"]
 current = true
 
+[node name="RayCast3D" type="RayCast3D" parent="Head/Camera"]
+transform = Transform3D(5, 0, 0, 0, -2.18557e-07, -5, 0, 5, -2.18557e-07, 0, 0, 0)
+hit_back_faces = false
+debug_shape_custom_color = Color(1, 0, 0, 1)
+debug_shape_thickness = 4
+
 [node name="HUD" parent="Head" instance=ExtResource("2_vqkcf")]
 
 [node name="HUDMapCamera" type="Camera3D" parent="Head"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10.5261)
 cull_mask = 1048574
 projection = 1
-
-[node name="RayCast3D" type="RayCast3D" parent="Head"]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
-hit_back_faces = false
