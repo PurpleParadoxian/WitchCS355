@@ -8,14 +8,19 @@ var activeScene = null
 func _ready():
 	var mmScene = mainMenuScene.instantiate()
 	activeScene = mmScene
-	mmScene.hello()
+	mmScene.changeScene.connect(_on_change_scene)
 	add_child(mmScene)
 	label.visible = false
 
-func changeScene(scene, info):
+func hi(a, b):
+	print(a, b)
+
+func _on_change_scene(scenePath : String, info : Variant):
+	print("recieved \"", scenePath, ", ", info, "\"")
 	label.visible = true
 	remove_child(activeScene)
-	var newScene = load(scene).instantiate()
+	var newScene = load(scenePath).instantiate()
+	print("changeScene ", info)
 	newScene.getInfo(info)
 	add_child(newScene)
 	activeScene = newScene

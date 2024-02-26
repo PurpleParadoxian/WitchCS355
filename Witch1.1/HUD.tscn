@@ -35,3 +35,27 @@ offset_left = 43.0
 offset_top = 52.0
 offset_right = 225.0
 offset_bottom = 136.0
+
+[node name="SaveNode" type="Node2D" parent="."]
+visible = false
+position = Vector2(32, 412)
+
+[node name="SaveButton" type="Button" parent="SaveNode"]
+offset_left = 15.0
+offset_top = 17.0
+offset_right = 119.0
+offset_bottom = 69.0
+text = "Save"
+
+[node name="SaveTextEdit" type="TextEdit" parent="SaveNode"]
+offset_left = 11.0
+offset_top = 107.0
+offset_right = 276.0
+offset_bottom = 189.0
+
+[node name="Label" type="Label" parent="SaveNode"]
+offset_left = 17.0
+offset_top = 83.0
+offset_right = 115.0
+offset_bottom = 119.0
+text = "FileName"
