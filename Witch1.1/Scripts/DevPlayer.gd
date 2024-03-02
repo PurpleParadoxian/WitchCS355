@@ -15,8 +15,7 @@ const jump_velocity = 10
 const mouse_sensitivity = 0.3
 const itemList = ["float", "replace", "place"]
 
-var newBlocksMut = Mutex.new()
-var newBlocks = []
+signal placeBlocks(cposs: Variant, poss : Variant, types: Variant)
 
 var materialI = 0
 var itemI = 0
@@ -30,13 +29,6 @@ func lessThanV(v, a):
 
 func posModV(v: Vector3i, mod):
 	return Vector3i(posmod(v.x, mod), posmod(v.y, mod), posmod(v.z, mod))
-
-func place_new_block(a : Vector3i, b : Vector3i, c: int):
-	print("placing " + Global.BLOCK_NAME_LIST[c])
-	newBlocksMut.lock()
-	newBlocks.push_back([a, b, c])
-	print(newBlocks)
-	newBlocksMut.unlock()
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -140,5 +132,5 @@ func _physics_process(delta):
 		boxShow.position = showBlockPos
 	
 	if Input.is_action_just_pressed("Place") and inChunkPos != null:
-		place_new_block(chunkPos, inChunkPos, materialI)
+		placeBlocks.emit([chunkPos], [inChunkPos], [materialI])
 		

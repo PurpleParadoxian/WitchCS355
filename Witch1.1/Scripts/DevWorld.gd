@@ -19,6 +19,9 @@ var all_chunks = {}
 var filename : String
 var devMode : bool
 
+var newBlocksMut = Mutex.new()
+var newBlocks = []
+
 func getInfo(a):
 	print("getInfo ", a)
 	filename = a[0]
@@ -35,6 +38,14 @@ func start():
 
 func _ready():
 	saveButton.pressed.connect(_on_save_button_pressed)
+	player.placeBlocks.connect(place_new_block)
+
+func place_new_block(a : Vector3i, b : Vector3i, c: int):
+	print("placing " + Global.BLOCK_NAME_LIST[c])
+	newBlocksMut.lock()
+	newBlocks.push_back([a, b, c])
+	print(newBlocks)
+	newBlocksMut.unlock()
 
 func strToVec3(a):
 	var b = a.split(",")
@@ -62,14 +73,16 @@ func _dev_thread_process():
 			if len(chk) < 1: break
 			var ch = chk.split(":")
 			var c = strToVec3(ch[0])
+			print("chunk Pos ", c)
 			var chunk = chunk_scene.instantiate()
 			chunk.set_chunk_position(c)
 			chunk.calc(ch[1])
+			add_child.call_deferred(chunk)
 			all_chunks[c] = chunk
 	_setInfoText.call_deferred("")
 	
 	while(true):
-		await get_tree().create_timer(1).timeout
+		await get_tree().create_timer(.25).timeout
 		
 		if savePlease > 0:
 			var file = FileAccess.open("user://builtLevels/" + saveName.text, FileAccess.WRITE)
@@ -88,14 +101,14 @@ func _dev_thread_process():
 				var prevBlk = -1
 				var blkRun = 0
 				for blk in chunk.blocks:
-					if blkRun > 499 or blk != prevBlk:
+					if blk != prevBlk:
 						if blkRun > 4:
 							saveString += "+" + str(blkRun)
 						else:
 							if prevBlk != -1: 
 								for i in range(blkRun):
 									saveString += blkToText[prevBlk]
-						if blk != prevBlk: saveString += blkToText[blk]
+						saveString += blkToText[blk]
 						prevBlk = blk
 						blkRun = 0
 					else: 
@@ -105,20 +118,20 @@ func _dev_thread_process():
 			savePlease -= 1
 		
 		# handle block placements
-		while not player.newBlocks.is_empty():
-			player.newBlocksMut.lock()
-			var a = player.newBlocks.pop_front()
-			player.newBlocksMut.unlock()
+		while not newBlocks.is_empty():
+			newBlocksMut.lock()
+			var a = newBlocks.pop_front()
+			newBlocksMut.unlock()
 			
 			if not all_chunks.has(a[0]): # make a new chunk if player tries to place a block where one doesn't exist
 				print("made new chunk " + str(a[0]))
 				_setInfoText.call_deferred("making new chunk: " + str(a[0]))
 				var chkPos = a[0]
-				var chunk = chunk_scene.instantiate()
-				chunk.set_chunk_position(chkPos)
-				chunk.calc()
-				all_chunks[chkPos] = chunk
-				chunks.add_child(chunk)
+				var newChunk = chunk_scene.instantiate()
+				newChunk.set_chunk_position(chkPos)
+				newChunk.calc()
+				all_chunks[chkPos] = newChunk
+				chunks.add_child(newChunk)
 			var chunk = all_chunks[a[0]]
 			var blkPos = a[1]
 			var type = a[2]
