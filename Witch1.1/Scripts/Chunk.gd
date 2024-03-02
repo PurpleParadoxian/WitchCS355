@@ -65,13 +65,14 @@ func generate( theString : String = ""):
 				j+= 1
 		else:
 			cha = theString[j]
-		j += 1
+			j += 1
 		
 		if continuing:
 			continuing = false
 			if previousBlock != Global.AIR:
 				for k in range(cha): blocks[k] = previousBlock
 			i += int(cha)
+			print("skipping ", int(cha))
 			continue
 		print(cha)
 		match cha:
@@ -92,7 +93,7 @@ func generate( theString : String = ""):
 				continue
 		
 		i += 1
-	
+
 	# the rest of the blocks are already air
 
 func build():
@@ -109,8 +110,6 @@ func build():
 							faceList[[i, item]] = chk_blk[Global.COLOR]
 
 func update():
-	print(len(faceList))
-	
 	if mesh_instance != null:
 		mesh_instance.call_deferred("queue_free")
 		mesh_instance = null
@@ -165,6 +164,7 @@ func create_face(faceNum, off, color):
 func set_chunk_position(pos):
 	chunk_position = pos
 	self.position = Vector3(pos*Global.DIMENSION*Global.BLOCK_SCALE)
+	print(self.position)
 	#self.visible = false
 
 func place_block(pos, type):

@@ -17,8 +17,8 @@ func _ready():
 	dir.change_dir("builtLevels")
 	var strs = dir.get_files()
 	
-	for str in strs:
-		list.add_item(str)
+	for s in strs:
+		list.add_item(s)
 
 func _on_button_1_pressed():
 	buttonDev.disabled = true
