@@ -1,13 +1,7 @@
 extends StaticBody3D
 
-const FACE_SIDES = [
-	Vector3i(0, 1, 0),  Vector3i(0, -1, 0),
-	Vector3i(-1, 0, 0), Vector3i(1, 0, 0),
-	Vector3i(0, 0, 1),  Vector3i(0, 0, -1)
-]
-
 var blocks
-var faceList
+var faceList = Dictionary()
 var entities = []
 
 var st = SurfaceTool.new()
@@ -21,12 +15,15 @@ var chunk_position = Vector3i() : set = set_chunk_position
 func _ready():
 	material.vertex_color_use_as_albedo = true
 
-func toBlock(x, y, z):
-	return (int(x)*64*64) + (int(y)*64) + (int(z))
+# blackbox test 1
+func toBlockV(v:Vector3i):
+	if v.x<0 or v.x>=64 or v.y<0 or v.y>=64 or v.z<0 or v.z>=64: return -1
+	return (int(v.x)*64*64) + (int(v.y)*64) + (int(v.z))
 
-func toBlockV(v):
-	var a = (int(v.x)*64*64) + (int(v.y)*64) + (int(v.z))
-	return a
+# blackbox test ?? (Its the same as the vector one)
+func toBlock(x, y, z):
+	if x<0 or x>=64 or y<0 or y>=64 or z<0 or z>=64: return -1
+	return (int(x)*64*64) + (int(y)*64) + (int(z))
 
 func lessThanV(v, a):
 	return v.x<a or v.y<a or v.z<a
@@ -42,15 +39,13 @@ func calc(a = null):
 		build()
 	update()
 
+# blackbox test 4
 func generate( theString : String = ""):
 	print("start generate")
-	faceList = Dictionary()
 	blocks = PackedByteArray()
 	var size = Global.DIMENSION.x*Global.DIMENSION.y*Global.DIMENSION.z
 	blocks.resize(size)
 	blocks.fill(Global.AIR)
-	
-	print(theString)
 	
 	var i = 0
 	var j = 0
@@ -60,20 +55,19 @@ func generate( theString : String = ""):
 	while i < size and strLen > j:
 		var cha = ""
 		if continuing:
-			while theString[j].is_valid_int() and strLen > j:
+			while strLen > j and theString[j].is_valid_int():
 				cha += theString[j]
 				j+= 1
+			continuing = false
+			if previousBlock != Global.AIR:
+				for k in range(int(cha)): blocks[k] = previousBlock
+			i += int(cha)
+			print("skipping ", int(cha))
+			continue
 		else:
 			cha = theString[j]
 			j += 1
 		
-		if continuing:
-			continuing = false
-			if previousBlock != Global.AIR:
-				for k in range(cha): blocks[k] = previousBlock
-			i += int(cha)
-			print("skipping ", int(cha))
-			continue
 		print(cha)
 		match cha:
 			"a": previousBlock = Global.AIR
@@ -93,9 +87,9 @@ func generate( theString : String = ""):
 				continue
 		
 		i += 1
-
 	# the rest of the blocks are already air
 
+# blackbox test 2
 func build():
 	print("start build")
 	for x in Global.DIMENSION.x:
@@ -105,7 +99,7 @@ func build():
 				if !check_transparent(item):
 					var chk_blk = Global.types[blocks[toBlockV(item)]]
 					for i in range(6):
-						var chk_item = item + FACE_SIDES[i]
+						var chk_item = item + Global.FACE_SIDES[i]
 						if check_transparent(chk_item): # or are the same type
 							faceList[[i, item]] = chk_blk[Global.COLOR]
 
@@ -138,8 +132,9 @@ func update():
 	self.visible = true
 	print("update success ", chunk_position)
 
+# blackbox test 3
 func check_transparent(off):
-	if greaterThanV(off, Global.DIMENSION[0]-1): return false
+	if greaterThanV(off, Global.DIMENSION[0]-1) or lessThanV(off, 0): return false
 	return not Global.types[blocks[toBlockV(off)]][Global.SOLID]
 
 func oppo_face(face):
@@ -153,19 +148,16 @@ func create_face(faceNum, off, color):
 	var c = Global.BLOCK_SCALE*Global.vertices[face[2]] + newOff
 	var d = Global.BLOCK_SCALE*Global.vertices[face[3]] + newOff
 	
-	#st.set_color(color)
 	var colors = []
 	colors.resize(4)
 	colors.fill(color)
 	print(color)
 	st.add_triangle_fan([a, b, c, d], [], colors, [], [], [])
-	#st.add_triangle_fan([a, c, d])
 
 func set_chunk_position(pos):
 	chunk_position = pos
 	self.position = Vector3(pos*Global.DIMENSION*Global.BLOCK_SCALE)
 	print(self.position)
-	#self.visible = false
 
 func place_block(pos, type):
 	print("chunk ", chunk_position, " accepting ", Global.BLOCK_NAME_LIST[type], " at ", pos)
@@ -177,7 +169,7 @@ func place_block(pos, type):
 	print(curTrans, newTrans, newColor)
 	if curTrans != newTrans:
 		for i in range(6):
-			var chk_pos = pos + FACE_SIDES[i]
+			var chk_pos = pos + Global.FACE_SIDES[i]
 			
 			var chk_blk
 			if greaterThanV(chk_pos, 63): chk_blk = Global.types[0]

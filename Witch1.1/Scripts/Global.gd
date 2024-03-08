@@ -4,6 +4,12 @@ const BLOCK_SCALE = 0.125
 const DIMENSION = Vector3i(64, 64, 64)
 const TEXTURE_ATLAS_SIZE = Vector2(3, 2)
 
+
+const FACE_SIDES = [
+	Vector3i(0, 1, 0),  Vector3i(0, -1, 0),
+	Vector3i(-1, 0, 0), Vector3i(1, 0, 0),
+	Vector3i(0, 0, 1),  Vector3i(0, 0, -1)
+]
 const faces = [
 	[2, 3, 7, 6],
 	[0, 4, 5, 1],

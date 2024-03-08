@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3 uid="uid://b4vh43u8w21jh"]
+
+[ext_resource type="Script" path="res://Scripts/MainMenu.gd" id="1_med8p"]
+
+[node name="MainMenu" type="Node2D"]
+script = ExtResource("1_med8p")
+
+[node name="Button1" type="Button" parent="."]
+offset_left = 119.0
+offset_top = 306.0
+offset_right = 205.0
+offset_bottom = 349.0
+disabled = true
+text = "Dev Mode"
+
+[node name="Button2" type="Button" parent="."]
+offset_left = 487.0
+offset_top = 309.0
+offset_right = 598.0
+offset_bottom = 350.0
+text = "Normal (WIP)"
+
+[node name="ItemList" type="ItemList" parent="."]
+offset_left = 124.0
+offset_top = 381.0
+offset_right = 420.0
+offset_bottom = 646.0
+item_count = 1
+item_0/text = "New"
+
+[connection signal="pressed" from="Button1" to="." method="_on_button_1_pressed"]
+[connection signal="pressed" from="Button2" to="." method="_on_button_2_pressed"]
+[connection signal="item_selected" from="ItemList" to="." method="_on_item_list_item_selected"]
