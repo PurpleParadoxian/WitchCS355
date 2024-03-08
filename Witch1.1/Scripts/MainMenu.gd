@@ -26,7 +26,7 @@ func _on_button_1_pressed():
 	print("emitted")
 	var a = len(changeScene.get_connections())
 	if a != 0:
-		changeScene.emit("res://DevWorld.tscn", [list.get_item_text(item), true])
+		changeScene.emit("res://scenes/DevWorld.tscn", [list.get_item_text(item), true])
 
 func _on_button_2_pressed():
 	pass # I haven't implemented the normal mode yet

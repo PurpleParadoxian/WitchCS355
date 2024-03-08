@@ -1,6 +1,6 @@
 extends Node3D
 
-var chunk_scene = preload("res://chunk.tscn")
+var chunk_scene = preload("res://scenes/chunk.tscn")
 
 const half_radius_vector = Vector3(load_radius, load_radius, load_radius)/2
 const load_radius = 1
@@ -40,15 +40,17 @@ func _ready():
 	saveButton.pressed.connect(_on_save_button_pressed)
 	player.placeBlocks.connect(place_new_block)
 
-func place_new_block(a : Vector3i, b : Vector3i, c: int):
-	print("placing " + Global.BLOCK_NAME_LIST[c])
+func place_new_block(a, b, c):
 	newBlocksMut.lock()
-	newBlocks.push_back([a, b, c])
+	for i in range(len(a)):
+		print("placing " + Global.BLOCK_NAME_LIST[c[i]])
+		newBlocks.push_back([a[i], b[i], c[i]])
 	print(newBlocks)
 	newBlocksMut.unlock()
 
 func strToVec3(a):
 	var b = a.split(",")
+	if len(b) != 3: return null
 	return Vector3i(int(b[0]), int(b[1]), int(b[2]))
 
 func update_player_position():

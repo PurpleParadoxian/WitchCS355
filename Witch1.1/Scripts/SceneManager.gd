@@ -1,6 +1,6 @@
 extends Node
 
-var mainMenuScene = preload("res://Menu.tscn")
+var mainMenuScene = preload("res://scenes/Menu.tscn")
 @onready var label = $Label
 
 var activeScene = null
