@@ -7,6 +7,7 @@ extends CharacterBody3D
 @onready var boxShow : MeshInstance3D = $SelectedBlockMesh
 @onready var lookAt : Label = $Head/HUD/LookingAt
 @onready var itemNm : Label = $Head/HUD/ItemName
+@onready var item2Nm : Label = $Head/HUD/Item2Name
 @onready var matNm : Label = $Head/HUD/MaterialName
 @onready var saveNd : Node2D = $Head/HUD/SaveNode
 
@@ -14,11 +15,14 @@ const movement_speed = 4
 const jump_velocity = 10
 const mouse_sensitivity = 0.3
 const itemList = ["float", "replace", "place"]
+const item2List = ["single", "fillChunk", "3x3"]
 
-signal placeBlocks(cposs: Variant, poss : Variant, types: Variant)
+signal placeBlocks(cpos: Vector3i, pos : Vector3i, type: int)
+signal placeRange(cpos: Vector3i, pos : Vector3i, rang1: Vector3i, rang2 : Vector3i, type: int)
 
 var materialI = 0
 var itemI = 0
+var item2I = 0
 var camera_x_rotation = 0
 var paused = false
 var god = true
@@ -51,6 +55,12 @@ func _input(event):
 		itemI += 1
 		if itemI == itemList.size(): itemI = 0
 		itemNm.text = itemList[itemI]
+		lookAt.text = ""
+		
+	if Input.is_action_just_pressed("SwapItem2"):
+		item2I += 1
+		if item2I == item2List.size(): item2I = 0
+		item2Nm.text = item2List[item2I]
 		lookAt.text = ""
 	
 	if Input.is_action_just_pressed("SwapMat"):
@@ -105,6 +115,8 @@ func _physics_process(delta):
 	var chunkPos
 	var inChunkPos
 	var showBlockPos = null
+	var range1 = null
+	var range2 = null
 	if itemI == 0:
 		var blockGlobalPos = position-cam_basis.z+cam_basis.y/2
 		var blockWorldPos = Vector3i(blockGlobalPos/Global.BLOCK_SCALE)
@@ -112,19 +124,20 @@ func _physics_process(delta):
 		inChunkPos = posModV(blockWorldPos, Global.DIMENSION[0])
 		print(blockWorldPos, " ", chunkPos, " ", inChunkPos)
 		showBlockPos = (Vector3(blockWorldPos) + Vector3.ONE/2)*Global.BLOCK_SCALE - position
-	elif itemI in [1,2] and cast.is_colliding():
-		var colPoint = cast.get_collision_point()
-		var colNorma = cast.get_collision_normal()
-		var blockWorldPos = Vector3i(colPoint/Global.BLOCK_SCALE + colNorma/2 * (-1 if itemI==1 else 1))
-		chunkPos = blockWorldPos/Global.DIMENSION
-		inChunkPos = posModV(blockWorldPos, Global.DIMENSION[0])
-		showBlockPos = (Vector3(blockWorldPos) + Vector3.ONE/2)*Global.BLOCK_SCALE - position
-		boxShow.position = showBlockPos
-		lookAt.text = "Chunk: " + str(chunkPos) + "\nPos: " + str(inChunkPos)
 	elif itemI in [1,2]:
-		lookAt.text = "NONE"
-		showBlockPos = null
-		inChunkPos = null
+		if cast.is_colliding():
+			var colPoint = cast.get_collision_point()
+			var colNorma = cast.get_collision_normal()
+			var blockWorldPos = Vector3i(colPoint/Global.BLOCK_SCALE + colNorma/2 * (-1 if itemI==1 else 1))
+			chunkPos = blockWorldPos/Global.DIMENSION
+			inChunkPos = posModV(blockWorldPos, Global.DIMENSION[0])
+			showBlockPos = (Vector3(blockWorldPos) + Vector3.ONE/2)*Global.BLOCK_SCALE - position
+			boxShow.position = showBlockPos
+			lookAt.text = "Chunk: " + str(chunkPos) + "\nPos: " + str(inChunkPos)
+		else:
+			lookAt.text = "NONE"
+			showBlockPos = null
+			inChunkPos = null
 	
 	if showBlockPos == null: boxShow.visible = false
 	else:
@@ -132,5 +145,7 @@ func _physics_process(delta):
 		boxShow.position = showBlockPos
 	
 	if Input.is_action_just_pressed("Place") and inChunkPos != null:
-		placeBlocks.emit([chunkPos], [inChunkPos], [materialI])
+		if item2I == 0: placeBlocks.emit(chunkPos, inChunkPos, materialI)
+		elif item2I == 1 and null not in [range1, range2]: 
+			placeRange.emit(chunkPos, inChunkPos, range1, range2, materialI)
 		

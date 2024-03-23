@@ -10,6 +10,15 @@ offset_left = 414.0
 offset_top = 484.0
 offset_right = 710.0
 offset_bottom = 558.0
+text = "hi"
+horizontal_alignment = 1
+
+[node name="Item2Name" type="Label" parent="."]
+offset_left = 413.0
+offset_top = 508.0
+offset_right = 709.0
+offset_bottom = 582.0
+text = "hi"
 horizontal_alignment = 1
 
 [node name="MaterialName" type="Label" parent="."]
@@ -17,6 +26,7 @@ offset_left = 427.0
 offset_top = 567.0
 offset_right = 714.0
 offset_bottom = 631.0
+text = "hi"
 
 [node name="SubViewport" type="SubViewport" parent="."]
 transparent_bg = true
