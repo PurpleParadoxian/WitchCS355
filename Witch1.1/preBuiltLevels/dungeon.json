@@ -2,12 +2,15 @@
 	{
 		"id": 0,
 		"score": 2,
-		"roomsNeeded": [
-			[10, 0 ,0, 0],
-			[0, 0, 25, 2]
-		],
+		"dir": 4,
 		"shape": [
 			10, 5, 25
 		],
+		"rotatable": 1,
+		"roomsNeeded": [
+			[10, 0, 0, 0, "hallway"],
+			[0, 0, 25, 2, "hallway"]
+		],
+		"roomType": ["starting"]
 	},
 ]
