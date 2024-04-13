@@ -1,0 +1,25 @@
+[
+	{
+		"id": 0,
+		"score": 2,
+		"dir": 4,
+		"shape": [10, 5, 25],
+		"rotatable": 0,
+		"roomsNeeded": [
+			[10, 0, 0, 0, "hallway"],
+			[0, 0, 25, 2, "hallway"]
+		],
+		"roomType": ["starting"]
+	}, {
+		"id": 1,
+		"score": 2,
+		"dir": 4,
+		"shape": [5, 5, 25],
+		"rotatable": 2,
+		"roomsNeeded": [
+			[10, 0, 0, 0, "hallway"],
+			[0, 0, 25, 2, "hallway"]
+		],
+		"roomType": ["starting"]
+	},
+]
