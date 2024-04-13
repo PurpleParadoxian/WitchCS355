@@ -1,0 +1,29 @@
+[
+	{
+		"id": 0,
+		"score": 0,
+		"special": "starting",
+		"dir": 4,
+		"rotatable": 0,
+		"sideTypes": [0, 0, 0, 0, 0, 0],
+		"adjRooms": [
+			{ "id":1, "pos":[0, 0, -1], "dir":4 },
+			{ "id":2, "pos":[0, -1, -1], "dir":1 },
+		],
+	}, {
+		"id": 1,
+		"score": 0,
+		"special": "dependant",
+		"dir": 4,
+		"rotatable": 0,
+		"sideTypes": [0, 0, 0, 0, 0, 0],
+		"adjRooms": [],
+	}, {
+		"id": 2,
+		"score": 2,
+		"dir": 4,
+		"rotatable": 2,
+		"sideTypes": [0, 0, 0, 0, 0, 0],
+		"adjRooms": [],
+	}, 
+]

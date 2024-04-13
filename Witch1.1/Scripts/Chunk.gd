@@ -43,7 +43,7 @@ func calc(a = null):
 func generate( theString : String = ""):
 	print("start generate")
 	blocks = PackedByteArray()
-	var size = Global.DIMENSION.x*Global.DIMENSION.y*Global.DIMENSION.z
+	var size = Global.SixForCubd
 	blocks.resize(size)
 	blocks.fill(Global.AIR)
 	
