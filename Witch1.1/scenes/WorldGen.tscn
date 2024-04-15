@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b1xc23b1o68ky"]
 
-[ext_resource type="Script" path="res://Scripts/WorldGen.gd" id="1_6bn5s"]
+[ext_resource type="Script" path="res://Scripts/WorldGenHerringbone.gd" id="1_8nve4"]
 
 [node name="WorldGen" type="Node3D"]
-script = ExtResource("1_6bn5s")
+script = ExtResource("1_8nve4")

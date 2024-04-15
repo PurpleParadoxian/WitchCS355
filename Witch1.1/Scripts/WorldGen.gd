@@ -73,8 +73,8 @@ func changeRotation(to, a):
 func addRoom(pos: Vector3, dir: int, room: MyRoom):
 	
 	for i in room.roomsNeeded: roomsToDo.push_front([i[0]+pos, i[1], i[2]])
-	for i in changeRotation(dir, room.shape):
-		collisions += [[pos[0]+i[0], pos[0]+i[1], pos[1]+i[2], pos[1]+i[3], pos[2]-i[4], pos[2]-i[5]]]
+	var i = changeRotation(dir, room.shape)
+	collisions += [[pos[0]+i[0], pos[0]+i[1], pos[1]+i[2], pos[1]+i[3], pos[2]-i[4], pos[2]-i[5]]]
 
 # loop through all values of collisions and return true if any overlap with the room given
 func testRoom(pos: Vector3, dir: int, room: MyRoom):

@@ -122,7 +122,7 @@ func _physics_process(delta):
 		var blockWorldPos = Vector3i(blockGlobalPos/Global.BLOCK_SCALE)
 		chunkPos = blockWorldPos/Global.DIMENSION
 		inChunkPos = posModV(blockWorldPos, Global.DIMENSION[0])
-		print(blockWorldPos, " ", chunkPos, " ", inChunkPos)
+		#print(blockWorldPos, " ", chunkPos, " ", inChunkPos)
 		showBlockPos = (Vector3(blockWorldPos) + Vector3.ONE/2)*Global.BLOCK_SCALE - position
 	elif itemI in [1,2]:
 		if cast.is_colliding():
