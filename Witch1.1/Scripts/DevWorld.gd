@@ -7,6 +7,7 @@ const load_radius = 1
 
 @onready var chunks = $Chunks
 @onready var player = $Player
+@onready var herring = $WorldGen
 @onready var info : Label = $Player/Head/HUD/Info
 @onready var saveButton : Button = $Player/Head/HUD/SaveNode/SaveButton
 @onready var saveName : TextEdit = $Player/Head/HUD/SaveNode/SaveTextEdit
@@ -16,13 +17,14 @@ var load_thread = Thread.new()
 var player_position = Vector3()
 var prev_player_position = Vector3i()
 var all_chunks = {}
-var filename : String
+var filename
 var devMode : bool
 
 var newBlocksMut = Mutex.new()
 var newBlocks = []
 var newBlocksRangeMut = Mutex.new()
 var newBlocksRange = []
+var preChunks = []
 
 func getInfo(a):
 	print("getInfo ", a)
@@ -32,8 +34,9 @@ func getInfo(a):
 
 func start():
 	print("start start" + str(devMode))
-	
-	var call_thread = _dev_thread_process if devMode else _thread_process
+	var call_thread
+	if devMode: call_thread = _dev_thread_process
+	else: call_thread = _thread_process
 	load_thread.start(call_thread)
 	print("thread started")
 	#load_thread.wait_to_finish()
@@ -57,18 +60,53 @@ func place_new_block(a : Vector3i, b : Vector3i, c: int):
 	print(newBlocks)
 	newBlocksMut.unlock()
 
+func loadAllPreChunks():
+	var file = FileAccess.open("res://builtChunks.txt", FileAccess.READ)
+	var content = file.get_as_text().split("\n")
+	for cnt in content:
+		preChunks += [cnt]
+
 func strToVec3(a):
 	var b = a.split(",")
 	return Vector3i(int(b[0]), int(b[1]), int(b[2]))
 
-func update_player_position():
+func toVCount(a):
+	if a < 0 or a >= herring.boundcub: return null
+	var z = a % herring.bound
+	var y = int(a/herring.bound) % herring.bound
+	var x = int(a/herring.boundsqr) % herring.bound
+	return Vector3i(x, y, z)
+
+func update_player_data():
 	player_position = player.position
+	# add player direction detection
 
 func _setInfoText(a):
 	info.text = a
 
 func _thread_process():
-	pass
+	while herring == null: 
+		print("waiting")
+		get_tree().create_timer(.25)
+	loadAllPreChunks()
+	
+	var count = 0
+	# this will recursiely add the other rooms in a grid fashion
+	while count < herring.boundcub:
+		if count%20==0: print(count/herring.boundcub*100,"%")
+		var built = herring.builtRooms[count]
+		if built == 255: 
+			count+=1
+			continue
+		
+		var c = toVCount(count)
+		var chunk = chunk_scene.instantiate()
+		chunk.set_chunk_position(c)
+		chunk.calc(preChunks[built])
+		#chunk.rotat(herring.buildRotat[count]) rotating doesn't work yet
+		add_child.call_deferred(chunk)
+		all_chunks[c] = chunk
+		count+=1
 
 var blkToText = ["a", "d", "g", "s"]
 
@@ -95,6 +133,7 @@ func _dev_thread_process():
 		await get_tree().create_timer(.25).timeout
 		
 		if savePlease > 0:
+			update_player_data.call_deferred()
 			var file = FileAccess.open("user://builtLevels/" + saveName.text, FileAccess.WRITE)
 			if file == null: 
 				savePlease -= 1
@@ -102,28 +141,27 @@ func _dev_thread_process():
 				continue
 			var saveString = ""
 			
-			for chk in all_chunks:
-				var chunk = all_chunks[chk]
-				var pos = chk
-				print("starting chunk ", chk)
-				saveString += "{},{},{}:".format([pos.x,pos.y,pos.z], "{}")
-				
-				var prevBlk = -1
-				var blkRun = 0
-				for blk in chunk.blocks:
-					if blk != prevBlk:
-						if blkRun > 4:
-							saveString += "+" + str(blkRun)
-						else:
-							if prevBlk != -1: 
-								for i in range(blkRun):
-									saveString += blkToText[prevBlk]
-						saveString += blkToText[blk]
-						prevBlk = blk
-						blkRun = 0
-					else: 
-						blkRun+= 1
-				saveString += "\n"
+			var pos = Vector3i(player_position/64)
+			
+			var chunk = all_chunks[pos]
+			print("starting chunk ", pos)
+			
+			var prevBlk = -1
+			var blkRun = 0
+			for blk in chunk.blocks:
+				if blk != prevBlk:
+					if blkRun > 4:
+						saveString += "+" + str(blkRun)
+					else:
+						if prevBlk != -1: 
+							for i in range(blkRun):
+								saveString += blkToText[prevBlk]
+					saveString += blkToText[blk]
+					prevBlk = blk
+					blkRun = 0
+				else: 
+					blkRun+= 1
+			saveString += "\n"
 			file.store_buffer(saveString.to_ascii_buffer())
 			savePlease -= 1
 		
@@ -148,6 +186,7 @@ func _dev_thread_process():
 			_setInfoText.call_deferred("placing block: " + str(blkPos) + "\nin Chunk: " + str(a[0]))
 			
 			chunk.place_block(blkPos, type)
+			chunk.update()
 			
 			_setInfoText.call_deferred("")
 		
@@ -187,8 +226,9 @@ func _dev_thread_process():
 						var chunk = all_chunks[tc]
 						var bPos = Vector3i(i, j, k)
 						chunk.place_block(bPos, a[4])
+						chunk.update()
 		
-		for c in all_chunks: c.update()
+		#for c in all_chunks: all_chunks[c].update()
 
 func _on_save_button_pressed():
 	print("a")

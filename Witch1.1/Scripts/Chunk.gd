@@ -41,7 +41,6 @@ func calc(a = null):
 
 # blackbox test 4
 func generate( theString : String = ""):
-	print("start generate")
 	blocks = PackedByteArray()
 	var size = Global.SixForCubd
 	blocks.resize(size)
@@ -62,23 +61,19 @@ func generate( theString : String = ""):
 			if previousBlock != Global.AIR:
 				for k in range(int(cha)): blocks[k] = previousBlock
 			i += int(cha)
-			print("skipping ", int(cha))
 			continue
 		else:
 			cha = theString[j]
 			j += 1
 		
-		print(cha)
 		match cha:
 			"a": previousBlock = Global.AIR
 			"s": 
 				previousBlock = Global.STONE
 				blocks[i] = Global.STONE
-				print("a stone")
 			"d": 
 				previousBlock = Global.DIRT
 				blocks[i] = Global.DIRT
-				print("a dirt")
 			"g": 
 				previousBlock = Global.GRASS
 				blocks[i] = Global.GRASS
@@ -91,7 +86,6 @@ func generate( theString : String = ""):
 
 # blackbox test 2
 func build():
-	print("start build")
 	for x in Global.DIMENSION.x:
 		for y in Global.DIMENSION.y:
 			for z in Global.DIMENSION.z:
@@ -130,7 +124,7 @@ func update():
 	mesh_instance.create_trimesh_collision.call_deferred()
 	
 	self.visible = true
-	print("update success ", chunk_position)
+	#print("update success ", chunk_position)
 
 # blackbox test 3
 func check_transparent(off):
@@ -151,22 +145,22 @@ func create_face(faceNum, off, color):
 	var colors = []
 	colors.resize(4)
 	colors.fill(color)
-	print(color)
+	#print(color)
 	st.add_triangle_fan([a, b, c, d], [], colors, [], [], [])
 
 func set_chunk_position(pos):
 	chunk_position = pos
 	self.position = Vector3(pos*Global.DIMENSION*Global.BLOCK_SCALE)
-	print(self.position)
+	#print(self.position)
 
 func place_block(pos, type):
-	print("chunk ", chunk_position, " accepting ", Global.BLOCK_NAME_LIST[type], " at ", pos)
-	print(len(faceList))
+	#print("chunk ", chunk_position, " accepting ", Global.BLOCK_NAME_LIST[type], " at ", pos)
+	#print(len(faceList))
 	
 	var curTrans = check_transparent(pos)
 	var newTrans = not Global.types[type][Global.SOLID]
 	var newColor = Global.types[type][Global.COLOR] if not newTrans else null
-	print(curTrans, newTrans, newColor)
+	#print(curTrans, newTrans, newColor)
 	if curTrans != newTrans:
 		for i in range(6):
 			var chk_pos = pos + Global.FACE_SIDES[i]
@@ -183,7 +177,7 @@ func place_block(pos, type):
 			elif chkTrans != newTrans: # add any that need to be
 				var c = newColor if chkTrans else chk_blk[Global.COLOR]
 				var b = [j, chk_pos] if newTrans else [i, pos]
-				print("adding ", b)
+				#print("adding ", b)
 				faceList[b] = c
 	elif not curTrans and not newTrans:
 		for i in range(6):
@@ -191,4 +185,4 @@ func place_block(pos, type):
 			if faceList.has(a):
 				faceList[a] = newColor
 	blocks[toBlockV(pos)] = type
-	print(len(faceList))
+	#print(len(faceList))

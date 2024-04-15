@@ -1,29 +1,68 @@
-[
-	{
-		"id": 0,
-		"score": 0,
-		"special": "starting",
-		"dir": 4,
-		"rotatable": 0,
-		"sideTypes": [0, 0, 0, 0, 0, 0],
-		"adjRooms": [
-			{ "id":1, "pos":[0, 0, -1], "dir":4 },
-			{ "id":2, "pos":[0, -1, -1], "dir":1 },
-		],
-	}, {
-		"id": 1,
-		"score": 0,
-		"special": "dependant",
-		"dir": 4,
-		"rotatable": 0,
-		"sideTypes": [0, 0, 0, 0, 0, 0],
-		"adjRooms": [],
-	}, {
-		"id": 2,
-		"score": 2,
-		"dir": 4,
-		"rotatable": 2,
-		"sideTypes": [0, 0, 0, 0, 0, 0],
-		"adjRooms": [],
-	}, 
-]
+{
+	"nRooms": 8,
+	"rooms":[
+		{
+			"id": 0,
+			"score": 0,
+			"special": "starting",
+			"pos": [0, 5, 5],
+			"dir": 4,
+			"rotatable": 0,
+			"sides": [0, 0, 0, 0, 0, 0],
+			"adjRooms": [
+				{ "id":1, "pos":[0, 0, -1], "dir":4 },
+				{ "id":2, "pos":[0, -1, -1], "dir":4 },
+			],
+		}, {
+			"id": 1,
+			"score": 0,
+			"special": "dependant",
+			"dir": 4,
+			"rotatable": 0,
+			"sides": [0, 0, 0, 0, 0, 0],
+			"adjRooms": [],
+		}, {
+			"id": 2,
+			"score": 3,
+			"dir": 4,
+			"rotatable": 2,
+			"sides": [1, 1, 0, 0, 0, 0],
+			"adjRooms": [],
+		},{
+			"id": 3,
+			"score": 3,
+			"dir": 4,
+			"rotatable": 2,
+			"sides": [0, 0, 0, 0, 1, 1],
+			"adjRooms": [],
+		}, {
+			"id": 4,
+			"score": 2,
+			"dir": 4,
+			"rotatable": 2,
+			"sides": [1, 1, 1, 1, 1, 1],
+			"adjRooms": [],
+		}, {
+			"id": 5,
+			"score": 2,
+			"dir": 4,
+			"rotatable": 2,
+			"sides": [1, 0, 0, 0, 1, 1],
+			"adjRooms": [],
+		}, {
+			"id": 6,
+			"score": 2,
+			"dir": 4,
+			"rotatable": 2,
+			"sides": [1, 1, 0, 0, 1, 1],
+			"adjRooms": [],
+		}, {
+			"id": 7,
+			"score": 2,
+			"dir": 4,
+			"rotatable": 2,
+			"sides": [1, 1, 1, 1, 0, 1],
+			"adjRooms": [],
+		}, 
+	]
+}

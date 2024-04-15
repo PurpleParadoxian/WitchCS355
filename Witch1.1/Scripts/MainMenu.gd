@@ -29,7 +29,7 @@ func _on_button_1_pressed():
 		changeScene.emit("res://scenes/DevWorld.tscn", [list.get_item_text(item), true])
 
 func _on_button_2_pressed():
-	pass # I haven't implemented the normal mode yet
+	changeScene.emit("res://scenes/DevWorld.tscn", [null, false])
 
 func _on_item_list_item_selected(index):
 	print('selected soemthing')
