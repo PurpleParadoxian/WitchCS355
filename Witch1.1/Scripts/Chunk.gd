@@ -1,12 +1,12 @@
 extends StaticBody3D
 
 var blocks
-var faceList = Dictionary()
+var faceList = {}
 var entities = []
 
 var st = SurfaceTool.new()
 var mesh = null
-var mesh_instance = null
+@onready var mesh_instance : MeshInstance3D = $MeshInstance3D
 
 var material = StandardMaterial3D.new()
 
@@ -98,14 +98,9 @@ func build():
 							faceList[[i, item]] = chk_blk[Global.COLOR]
 
 func update():
-	if mesh_instance != null:
-		mesh_instance.call_deferred("queue_free")
-		mesh_instance = null
-	
 	if faceList.is_empty(): return
 	
 	mesh = ArrayMesh.new()
-	mesh_instance = MeshInstance3D.new()
 	st.set_material(material)
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	
@@ -119,8 +114,6 @@ func update():
 	mesh.surface_set_material(0, material)
 	mesh_instance.set_mesh(mesh)
 	
-	add_child.call_deferred(mesh_instance)
-	#mesh_instance.owner = self
 	mesh_instance.create_trimesh_collision.call_deferred()
 	
 	self.visible = true
@@ -186,3 +179,40 @@ func place_block(pos, type):
 				faceList[a] = newColor
 	blocks[toBlockV(pos)] = type
 	#print(len(faceList))
+
+func saveChunk():
+	var blkToText = ["a", "d", "g", "s"]
+	var prevBlk = -1
+	var blkRun = 0
+	var saveString = ""
+	for blk in blocks:
+		if blk != prevBlk:
+			if blkRun > 4:
+				saveString += "+" + str(blkRun)
+			else:
+				if prevBlk != -1: 
+					for i in range(blkRun):
+						saveString += blkToText[prevBlk]
+			saveString += blkToText[blk]
+			prevBlk = blk
+			blkRun = 0
+		else: 
+			blkRun+= 1
+	saveString += "\n"
+	return saveString
+
+func _get_property_list():
+	if Engine.is_editor_hint(): return
+	# But in game, Godot will see this
+	return [
+		{
+			"name": "blocks",
+			"type": TYPE_PACKED_BYTE_ARRAY,
+			"usage": PROPERTY_USAGE_STORAGE
+		},
+		{
+			"name": "faceList",
+			"type": TYPE_DICTIONARY,
+			"usage": PROPERTY_USAGE_STORAGE
+		}
+	]

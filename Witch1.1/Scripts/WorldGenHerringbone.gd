@@ -24,6 +24,7 @@ class AdjRoom:
 	var pos
 	var dir
 
+var rng
 var bound = 10
 var boundsqr = bound*bound
 var boundcub = boundsqr*bound
@@ -73,7 +74,7 @@ func buildPossibleRooms():
 			for i in a["adjRooms"]: newRoom.adjRooms += [AdjRoom.new(i)]
 		allRooms[newRoom.id] = newRoom
 
-func _ready():
+func doTheBuilding():
 	builtRooms = PackedByteArray()
 	builtRooms.resize(boundcub)
 	builtRooms.fill(255)
@@ -81,18 +82,17 @@ func _ready():
 	#builtRotat.resize(Global.SixForCubd)
 	#builtRotat.fill(4)
 	
-	var rng = RandomNumberGenerator.new()
+	rng = RandomNumberGenerator.new()
 	
 	# allRooms are loaded from a json file containing all rooms TODO: BUILD MORE ROOMS
 	buildPossibleRooms()
 	
 	for startingRoom in specialRooms["starting"]: addRoom(startingRoom.pos, startingRoom.dir, startingRoom)
 	
-	
 	var count = 0
 	# this will recursiely add the other rooms in a grid fashion
 	while count < boundcub:
-		if count%boundcub ==0: print(int(count/boundsqr),"/", bound)
+		#if count%boundsqr==0: print(int(count/boundsqr),"/", bound)
 		
 		if builtRooms[count] != 255: # if we already have a room there, skip
 			count += 1
@@ -100,19 +100,19 @@ func _ready():
 		
 		var total = 0
 		var possibleRooms = []
-		var fronCubSide = null
-		var downCubSide = null
-		var leftCubSide = null
-		if count >= boundsqr: 
-			var tryRoom = builtRooms[count - boundsqr]
+		var fronCubSide = 0
+		var downCubSide = 0
+		var leftCubSide = 0
+		if count % bound != 0: 
+			var tryRoom = builtRooms[count - 1]
 			if tryRoom == 255: fronCubSide = 0
 			else: fronCubSide = allRooms[tryRoom].sides[BACK]
 		if count%boundsqr>=bound: 
 			var tryRoom = builtRooms[count - bound]
 			if tryRoom == 255: downCubSide = 0
 			else: downCubSide = allRooms[tryRoom].sides[UP]
-		if count % bound != 0: 
-			var tryRoom = builtRooms[count - 1]
+		if count >= boundsqr: 
+			var tryRoom = builtRooms[count - boundsqr]
 			if tryRoom == 255: leftCubSide = 0
 			else: leftCubSide = allRooms[tryRoom].sides[RIGHT]
 		
@@ -128,9 +128,7 @@ func _ready():
 				# we keep the first permutation that fits for any room
 				#total += room.score
 				#possibleRooms += [[room, i]]
-			if fronCubSide != null and room.sides[FRONT] != fronCubSide or \
-				   downCubSide != null and room.sides[DOWN]  != downCubSide or \
-				   leftCubSide != null and room.sides[LEFT]  != leftCubSide: continue
+			if room.sides[FRONT] != fronCubSide or room.sides[DOWN] != downCubSide or room.sides[LEFT] != leftCubSide: continue
 			total += room.score
 			possibleRooms += [room]
 		
@@ -144,17 +142,17 @@ func _ready():
 					break
 		
 		count += 1
-	print("built rooms: ", builtRooms)
 
 # from and to are enums for the direction, a is an array of 6 numbers that represent a box
 func changeRotation(to, a):
-	# normal = UP, DOWN, LEFT, FRONT, RIGHT, BACK
-	if to == FRONT: return a
-	if to == LEFT:  return [a[UP], a[DOWN], a[FRONT], a[RIGHT], a[BACK], a[LEFT]]
-	if to == RIGHT: return [a[UP], a[DOWN], a[RIGHT], a[BACK], a[LEFT], a[FRONT]]
-	if to == BACK:  return [a[UP], a[DOWN], a[BACK], a[LEFT], a[FRONT], a[RIGHT]]
+	# normal = UP, DOWN, LEFT, FRONT, RIGHT, BACK	
+	
 	if to == UP:    return [a[FRONT], a[BACK], a[LEFT], a[DOWN], a[RIGHT], a[UP]]
 	if to == DOWN:  return [a[BACK], a[FRONT], a[LEFT], a[UP], a[RIGHT], a[DOWN]]
+	if to == LEFT:  return [a[UP], a[DOWN], a[FRONT], a[RIGHT], a[BACK], a[LEFT]]
+	if to == FRONT: return a
+	if to == RIGHT: return [a[UP], a[DOWN], a[RIGHT], a[BACK], a[LEFT], a[FRONT]]
+	if to == BACK:  return [a[UP], a[DOWN], a[BACK], a[LEFT], a[FRONT], a[RIGHT]]
 
 func rotDirV(from, to, a): # this doesn't work yet, I'll work on it
 	pass
@@ -164,5 +162,5 @@ func addRoom(pos: Vector3i, dir: int, room: MyRoom):
 	#builtRotat[a] = dir
 	builtRooms[a] = room.id
 	for i in room.adjRooms:
-		addRoom(pos+room.dir, i.dir, allRooms[i.id]) # currently we cannot rotate rooms that have adjRooms (dependencies)
+		addRoom(pos+i.pos, i.dir, allRooms[i.id]) # currently we cannot rotate rooms that have adjRooms (dependencies)
 		#addRoom(pos+rotDirV(room.dir, dir, i.pos), i.dir, allRooms[i.id])
