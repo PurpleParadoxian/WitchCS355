@@ -12,6 +12,7 @@ extends CharacterBody3D
 @onready var saveNd : Node2D = $Head/HUD/SaveNode
 
 const movement_speed = 4
+const sprint_speed = 8
 const jump_velocity = 10
 const mouse_sensitivity = 0.3
 const itemList = ["float", "replace", "place"]
@@ -95,19 +96,23 @@ func _physics_process(delta):
 	if Input.is_action_pressed("Right"):
 		direction += my_basis.x
 	
+	var ms
+	if Input.is_action_pressed("Sprint"): ms = sprint_speed
+	else: ms = movement_speed
+	
 	if god:
 		if Input.is_action_pressed("Jump"):
 			direction += my_basis.y
 		if Input.is_action_pressed("Descend"):
 			direction -= my_basis.y
-		velocity.y = direction.y * movement_speed
+		velocity.y = direction.y * ms
 	else:
 		if Input.is_action_just_pressed("Jump") and is_on_floor():
 			velocity.y = jump_velocity
 		velocity.y -= gravity*delta
 	
-	velocity.x = direction.x * movement_speed
-	velocity.z = direction.z * movement_speed
+	velocity.x = direction.x * ms
+	velocity.z = direction.z * ms
 	move_and_slide()
 	
 	# place and break blocks
@@ -123,6 +128,7 @@ func _physics_process(delta):
 		chunkPos = blockWorldPos/Global.DIMENSION
 		inChunkPos = posModV(blockWorldPos, Global.DIMENSION[0])
 		#print(blockWorldPos, " ", chunkPos, " ", inChunkPos)
+		lookAt.text = str(chunkPos) + ", " + str(inChunkPos)
 		showBlockPos = (Vector3(blockWorldPos) + Vector3.ONE/2)*Global.BLOCK_SCALE - position
 	elif itemI in [1,2]:
 		if cast.is_colliding():

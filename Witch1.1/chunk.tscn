@@ -4,3 +4,5 @@
 
 [node name="Chunk" type="StaticBody3D"]
 script = ExtResource("1_m7fe8")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]

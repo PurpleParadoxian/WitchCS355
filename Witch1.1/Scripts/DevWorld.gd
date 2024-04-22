@@ -7,7 +7,6 @@ const load_radius = 1
 
 @onready var chunks = $Chunks
 @onready var player = $Player
-@onready var herring = $WorldGen
 @onready var info : Label = $Player/Head/HUD/Info
 @onready var saveButton : Button = $Player/Head/HUD/SaveNode/SaveButton
 @onready var saveName : TextEdit = $Player/Head/HUD/SaveNode/SaveTextEdit
@@ -24,7 +23,8 @@ var newBlocksMut = Mutex.new()
 var newBlocks = []
 var newBlocksRangeMut = Mutex.new()
 var newBlocksRange = []
-var preChunks = []
+var preChunks = {}
+var herring
 
 func getInfo(a):
 	print("getInfo ", a)
@@ -36,7 +36,16 @@ func start():
 	print("start start" + str(devMode))
 	var call_thread
 	if devMode: call_thread = _dev_thread_process
-	else: call_thread = _thread_process
+	else: 
+		call_thread = _thread_process
+		herring = load("res://scenes/WorldGen.tscn").instantiate()
+		var b1 = Time.get_unix_time_from_system()
+		herring.doTheBuilding()
+		var b2 = Time.get_unix_time_from_system()
+		loadAllPreChunks(getUniques(herring.builtRooms))
+		var b3 = Time.get_unix_time_from_system()
+		
+		print("t1: ", b2-b1, ", t2: ", b3-b2)
 	load_thread.start(call_thread)
 	print("thread started")
 	#load_thread.wait_to_finish()
@@ -60,11 +69,24 @@ func place_new_block(a : Vector3i, b : Vector3i, c: int):
 	print(newBlocks)
 	newBlocksMut.unlock()
 
-func loadAllPreChunks():
+func getUniques(a):
+	var dic = {}
+	for i in a:
+		dic[i] = 0
+	dic.erase(255)
+	return dic.keys()
+
+func loadAllPreChunks(a):
 	var file = FileAccess.open("res://builtChunks.txt", FileAccess.READ)
 	var content = file.get_as_text().split("\n")
-	for cnt in content:
-		preChunks += [cnt]
+	for i in a:
+		preChunks[i] = PackedScene.new()
+		
+		var chunk = chunk_scene.instantiate()
+		chunk._ready()
+		chunk.calc(content[i])
+		preChunks[i].pack(chunk)
+		chunk.call_deferred("queue_free")
 
 func strToVec3(a):
 	var b = a.split(",")
@@ -85,24 +107,22 @@ func _setInfoText(a):
 	info.text = a
 
 func _thread_process():
-	while herring == null: 
-		print("waiting")
-		get_tree().create_timer(.25)
-	loadAllPreChunks()
+	
+	#loadAllPreChunks(getUniques(herring.builtRooms))
 	
 	var count = 0
 	# this will recursiely add the other rooms in a grid fashion
 	while count < herring.boundcub:
-		if count%20==0: print(count/herring.boundcub*100,"%")
+		if count%herring.boundsqr==0: print(float(count)/herring.boundcub*100,"%")
 		var built = herring.builtRooms[count]
 		if built == 255: 
 			count+=1
 			continue
 		
 		var c = toVCount(count)
-		var chunk = chunk_scene.instantiate()
+		var chunk = preChunks[built].instantiate()
 		chunk.set_chunk_position(c)
-		chunk.calc(preChunks[built])
+		#print("doing ", c, ", faces: ", len(chunk.faceList), ", meshIns: ", chunk.mesh_instance)
 		#chunk.rotat(herring.buildRotat[count]) rotating doesn't work yet
 		add_child.call_deferred(chunk)
 		all_chunks[c] = chunk
@@ -115,53 +135,34 @@ func _dev_thread_process():
 	_setInfoText.call_deferred("loading premade chunks")
 	if filename != "New":
 		var file = FileAccess.open("user://builtLevels/" + filename, FileAccess.READ)
-		var content = file.get_as_text().split("\n")
+		var content = file.get_as_text()
 		print(content)
-		for chk in content:
-			if len(chk) < 1: break
-			var ch = chk.split(":")
-			var c = strToVec3(ch[0])
-			print("chunk Pos ", c)
-			var chunk = chunk_scene.instantiate()
-			chunk.set_chunk_position(c)
-			chunk.calc(ch[1])
-			add_child.call_deferred(chunk)
-			all_chunks[c] = chunk
+		var chunk = chunk_scene.instantiate()
+		chunk.set_chunk_position(Vector3i.ZERO)
+		chunk._ready()
+		chunk.calc(content)
+		add_child.call_deferred(chunk)
+		all_chunks[Vector3i.ZERO] = chunk
 	_setInfoText.call_deferred("")
 	
 	while(true):
+		update_player_data.call_deferred()
 		await get_tree().create_timer(.25).timeout
 		
 		if savePlease > 0:
-			update_player_data.call_deferred()
+			var pos = Vector3i(player_position/64)
+			if not all_chunks.has(pos): 
+				print("there is no chunk there")
+				break
+			var chunk = all_chunks[pos]
+			var saveString = chunk.saveChunk()
+			
 			var file = FileAccess.open("user://builtLevels/" + saveName.text, FileAccess.WRITE)
 			if file == null: 
 				savePlease -= 1
 				printerr("failed cause ", FileAccess.get_open_error())
 				continue
-			var saveString = ""
 			
-			var pos = Vector3i(player_position/64)
-			
-			var chunk = all_chunks[pos]
-			print("starting chunk ", pos)
-			
-			var prevBlk = -1
-			var blkRun = 0
-			for blk in chunk.blocks:
-				if blk != prevBlk:
-					if blkRun > 4:
-						saveString += "+" + str(blkRun)
-					else:
-						if prevBlk != -1: 
-							for i in range(blkRun):
-								saveString += blkToText[prevBlk]
-					saveString += blkToText[blk]
-					prevBlk = blk
-					blkRun = 0
-				else: 
-					blkRun+= 1
-			saveString += "\n"
 			file.store_buffer(saveString.to_ascii_buffer())
 			savePlease -= 1
 		
