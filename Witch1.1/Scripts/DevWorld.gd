@@ -1,6 +1,6 @@
 extends Node3D
 
-var chunk_scene = preload("res://chunk.tscn")
+var chunk_scene = preload("res://scenes/chunk.tscn")
 
 const half_radius_vector = Vector3(load_radius, load_radius, load_radius)/2
 const load_radius = 1
@@ -15,7 +15,10 @@ var savePlease = 0
 var load_thread = Thread.new()
 var player_position = Vector3()
 var prev_player_position = Vector3i()
+
+
 var all_chunks = {}
+
 var filename
 var devMode : bool
 
@@ -150,7 +153,7 @@ func _dev_thread_process():
 		await get_tree().create_timer(.25).timeout
 		
 		if savePlease > 0:
-			var pos = Vector3i(player_position/64)
+			var pos = Vector3i(player_position*Global.BLOCK_SCALE)
 			if not all_chunks.has(pos): 
 				print("there is no chunk there")
 				break

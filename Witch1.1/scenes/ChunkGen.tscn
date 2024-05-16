@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8h3c0xdsjs5d"]
+
+[ext_resource type="Script" path="res://Scripts/ChunkGen.gd" id="1_06rct"]
+
+[node name="ChunkGen" type="Node"]
+script = ExtResource("1_06rct")

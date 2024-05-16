@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://bvgab6yhjvyh8"]
+
+[ext_resource type="Script" path="res://Scripts/KilaTest.gd" id="1_w7etr"]
+[ext_resource type="PackedScene" uid="uid://cwh0as6nuwu5l" path="res://scenes/DevPlayer.tscn" id="2_lkqss"]
+
+[node name="KilaTest" type="Node3D"]
+script = ExtResource("1_w7etr")
+playerPos = Vector3(237.91, 192.417, 97.7736)
+
+[node name="GigaChunkHolder" type="Node3D" parent="."]
+
+[node name="Player" parent="." instance=ExtResource("2_lkqss")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 237.91, 192.417, 97.7736)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.679044, 0.612761, -0.404257, 0, 0.550685, 0.834713, 0.734097, -0.566807, 0.37394, 0, 8.88254, 0)
