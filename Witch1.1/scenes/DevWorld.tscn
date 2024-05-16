@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://cjbw6dqehjq0w"]
+[gd_scene load_steps=4 format=3 uid="uid://cjbw6dqehjq0w"]
 
 [ext_resource type="Script" path="res://Scripts/DevWorld.gd" id="1_q8wcj"]
 [ext_resource type="PackedScene" uid="uid://cwh0as6nuwu5l" path="res://scenes/DevPlayer.tscn" id="2_f3dt0"]
+[ext_resource type="PackedScene" uid="uid://b8h3c0xdsjs5d" path="res://scenes/ChunkGen.tscn" id="3_1u0mr"]
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_q8wcj")
@@ -13,3 +14,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.43607, 5.35561, 6.63911)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.550685, 0.834713, 0, -0.834713, 0.550685, 0, 8.88254, 0)
+
+[node name="ChunkGen" parent="." instance=ExtResource("3_1u0mr")]

@@ -1,3 +1,4 @@
+@tool
 extends StaticBody3D
 
 var blocks
@@ -8,9 +9,12 @@ var st = SurfaceTool.new()
 var mesh = null
 @onready var mesh_instance : MeshInstance3D = $MeshInstance3D
 
+const BLOCK_SCALES = [0.125, 0.125*2, 0.125*4, 0.125*8, .125*16, .125*16*5]
+
 var material = StandardMaterial3D.new()
 
-var chunk_position = Vector3i() : set = set_chunk_position
+var chunk_scale := 0 : set = set_chunk_scale
+var chunk_position := Vector3i() : set = set_chunk_position
 
 func _ready():
 	material.vertex_color_use_as_albedo = true
@@ -31,16 +35,14 @@ func lessThanV(v, a):
 func greaterThanV(v, a):
 	return v.x>a or v.y>a or v.z>a
 
-func calc(a = null):
-	if a == null: 
-		generate()
-	else: 
-		generate(a)
-		build()
+func calc():
+	generate()
+	build()
 	update()
 
 # blackbox test 4
-func generate( theString : String = ""):
+func generate():
+	var theString = "a+83219d+20a+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42d+20a+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794da+18da+1258da+18da+2794d+20a+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42da+18da+42d+20a"
 	blocks = PackedByteArray()
 	var size = Global.SixForCubd
 	blocks.resize(size)
@@ -141,9 +143,15 @@ func create_face(faceNum, off, color):
 	#print(color)
 	st.add_triangle_fan([a, b, c, d], [], colors, [], [], [])
 
+func set_chunk_scale(scale: int):
+	chunk_scale = scale
+	self.position = Vector3(chunk_position*Global.DIMENSION*BLOCK_SCALES[chunk_scale])
+	mesh_instance.scale = Vector3.ONE*BLOCK_SCALES[chunk_scale]/Global.BLOCK_SCALE
+	#mesh_instance.force_update_transform()
+
 func set_chunk_position(pos):
 	chunk_position = pos
-	self.position = Vector3(pos*Global.DIMENSION*Global.BLOCK_SCALE)
+	self.position = Vector3(pos*Global.DIMENSION*BLOCK_SCALES[chunk_scale])
 	#print(self.position)
 
 func place_block(pos, type):
@@ -202,7 +210,7 @@ func saveChunk():
 	return saveString
 
 func _get_property_list():
-	if Engine.is_editor_hint(): return
+	#if Engine.is_editor_hint(): return
 	# But in game, Godot will see this
 	return [
 		{
@@ -215,4 +223,5 @@ func _get_property_list():
 			"type": TYPE_DICTIONARY,
 			"usage": PROPERTY_USAGE_STORAGE
 		}
+		
 	]

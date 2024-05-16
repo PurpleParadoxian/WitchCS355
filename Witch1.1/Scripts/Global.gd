@@ -1,6 +1,7 @@
 extends Node
 
 const BLOCK_SCALE = 0.125
+const BLOCK_SCALES = [0.125, 0.125*2, 0.125*4, 0.125*8]
 const DIMENSION = Vector3i(64, 64, 64)
 const TEXTURE_ATLAS_SIZE = Vector2(3, 2)
 const SixForSqrd = 64 * 64
